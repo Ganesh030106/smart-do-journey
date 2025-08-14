@@ -17,7 +17,8 @@ import BlastEffect from "@/components/BlastEffect";
 import TaskEditDialog from "@/components/TaskEditDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Label } from "@/components/ui/label";
 import type { Task } from "@/types/task";
 import { fetchTasksForUser, insertTaskForUser, updateTaskForUser, deleteTaskForUser } from "@/integrations/supabase/tasks";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -60,6 +61,8 @@ const TodoApp = () => {
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
   const [blastByTask, setBlastByTask] = useState<Record<string, { key: number; variant: 'success' | 'danger' }>>({});
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareLink, setShareLink] = useState('');
   
   const { toast } = useToast();
   const { user, isGuest } = useAuth();
@@ -279,6 +282,38 @@ const TodoApp = () => {
       title: "Task Deleted! 🗑️",
       description: "Task has been removed from your list"
     });
+  };
+
+  // Share task list function
+  const shareTaskList = () => {
+    const currentFilters = {
+      taskFilter,
+      categoryFilter,
+      priorityFilter,
+      startDate: startDate?.toISOString(),
+      endDate: endDate?.toISOString()
+    };
+    
+    const shareData = {
+      tasks: filteredTasks,
+      filters: currentFilters,
+      userStats,
+      timestamp: new Date().toISOString()
+    };
+    
+    // Create a shareable link (you can implement this with your own sharing service)
+    const shareUrl = `${window.location.origin}/shared?data=${encodeURIComponent(JSON.stringify(shareData))}`;
+    setShareLink(shareUrl);
+    setShowShareDialog(true);
+    
+    // Also try to use the Web Share API if available
+    if (navigator.share) {
+      navigator.share({
+        title: 'My Task List',
+        text: `Check out my task list with ${filteredTasks.length} tasks!`,
+        url: shareUrl
+      }).catch(console.error);
+    }
   };
 
   // Complete task with gamification
@@ -754,7 +789,12 @@ const TodoApp = () => {
           <div className="flex flex-col gap-4">
             <div className="flex items-center justify-between">
               <h2 className="text-xl font-semibold title-glow">Your Tasks</h2>
-              <Button variant="outline" size="sm" className="flex items-center gap-2">
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="flex items-center gap-2"
+                onClick={shareTaskList}
+              >
                 <Share2 className="h-4 w-4" />
                 Share List
               </Button>
@@ -971,6 +1011,78 @@ const TodoApp = () => {
         onSave={saveEditedTask}
         customCategories={customCategories}
       />
+
+      {/* Share Task List Dialog */}
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Share2 className="h-5 w-5" />
+              Share Task List
+            </DialogTitle>
+            <DialogDescription>
+              Share your current task list with others. The link includes your current filters and task status.
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="share-link">Shareable Link</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="share-link"
+                  value={shareLink}
+                  readOnly
+                  className="flex-1"
+                />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(shareLink);
+                    toast({
+                      title: "Link Copied! 📋",
+                      description: "Share link copied to clipboard"
+                    });
+                  }}
+                >
+                  Copy
+                </Button>
+              </div>
+            </div>
+            
+            <div className="text-sm text-muted-foreground">
+              <p><strong>What's included:</strong></p>
+              <ul className="list-disc list-inside mt-1 space-y-1">
+                <li>{filteredTasks.length} tasks</li>
+                <li>Current filters and categories</li>
+                <li>Task priorities and descriptions</li>
+                <li>Completion status</li>
+              </ul>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowShareDialog(false)}>
+              Close
+            </Button>
+            <Button 
+              onClick={() => {
+                if (navigator.share) {
+                  navigator.share({
+                    title: 'My Task List',
+                    text: `Check out my task list with ${filteredTasks.length} tasks!`,
+                    url: shareLink
+                  }).catch(console.error);
+                }
+              }}
+              disabled={!navigator.share}
+            >
+              Share via App
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* Delete Confirmation Dialog */}
       <Dialog open={!!deletingTaskId} onOpenChange={(open) => !open && setDeletingTaskId(null)}>
