@@ -155,6 +155,8 @@ const TodoApp = () => {
     return () => clearInterval(interval);
   }, [tasks, toast]);
 
+  // Reminder system moved to next line
+
   // XP calculation based on priority
   const getXPForTask = (priority: Task['priority']) => {
     const xpMap = { high: 30, medium: 20, low: 10 };
