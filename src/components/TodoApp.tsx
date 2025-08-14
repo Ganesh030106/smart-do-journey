@@ -734,11 +734,13 @@ const TodoApp = () => {
                 </Popover>
                 <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
-                  <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-32" /> 
+                                      <Input type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} className="w-32" /> 
+                  </div>
                 </div>
-                
-                <span className="ml-2 text-sm font-medium text-muted-foreground">Reminder:</span>
+
                 <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium text-muted-foreground">Reminder:</span>
+                  <div className="flex items-center gap-2">
                   <Clock className="h-4 w-4 text-muted-foreground" />
                   <Input 
                     type="datetime-local" 
