@@ -89,8 +89,6 @@ A modern, gamified todo application built with React, TypeScript, and Supabase. 
    npm run dev
    ```
 
-5. **Open your browser**
-   Navigate to `http://localhost:5173`
 
 ## 📱 Available Scripts
 
@@ -184,12 +182,6 @@ This project is licensed under the MIT License.
 - **Tailwind CSS** for styling utilities
 - **React community** for amazing libraries
 
-## 📞 Support
-
-If you have questions or need help:
-- Open an issue on GitHub
-- Check the documentation
-- Review the code examples
 
 ---
 
