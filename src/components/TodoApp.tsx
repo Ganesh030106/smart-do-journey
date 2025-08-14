@@ -33,6 +33,7 @@ interface UserStats {
 const TodoApp = () => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTask, setNewTask] = useState('');
+  const [newTaskDescription, setNewTaskDescription] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('personal');
   const [selectedPriority, setSelectedPriority] = useState<Task['priority']>('medium');
   const [userStats, setUserStats] = useState<UserStats>({
@@ -173,6 +174,7 @@ const TodoApp = () => {
     const newTaskObj: Task = {
       id: crypto.randomUUID(),
       text: taskText.trim(),
+      description: newTaskDescription.trim() || undefined,
       completed: false,
       category: selectedCategory,
       priority: selectedPriority,
@@ -194,6 +196,7 @@ const TodoApp = () => {
     }
 
     setNewTask('');
+    setNewTaskDescription('');
     setStartDate(undefined);
     setEndDate(undefined);
     setStartTime("");
@@ -610,6 +613,15 @@ const TodoApp = () => {
                 Add Task
               </Button>
             </div>
+            
+            <div className="flex gap-2">
+              <Input
+                value={newTaskDescription}
+                onChange={(e) => setNewTaskDescription(e.target.value)}
+                placeholder="Add a description (optional)"
+                className="flex-1"
+              />
+            </div>
 
             <div className="flex gap-2 flex-wrap">
               <div className="flex gap-1 flex-wrap">
@@ -872,6 +884,11 @@ const TodoApp = () => {
                         <p className="">
                           {task.text}
                         </p>
+                        {task.description && (
+                          <p className="text-sm text-muted-foreground mt-1 italic">
+                            {task.description}
+                          </p>
+                        )}
                         <div className="flex gap-2 mt-1 flex-wrap">
                           <Badge
                             variant="secondary"

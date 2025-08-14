@@ -107,6 +107,16 @@ export default function TaskEditDialog({
             />
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="task-description">Description (Optional)</Label>
+            <Input
+              id="task-description"
+              value={editedTask.description || ''}
+              onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
+              placeholder="Add more details about this task..."
+            />
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label>Category</Label>
